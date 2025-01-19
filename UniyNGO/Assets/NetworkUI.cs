@@ -12,7 +12,7 @@ public class NetworkUI : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI playersCountText;
 
     private NetworkVariable<int> playersNum = new NetworkVariable<int>(
-        0, NetworkVariableReadPermission.Everyone);
+        0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Awake()
     {

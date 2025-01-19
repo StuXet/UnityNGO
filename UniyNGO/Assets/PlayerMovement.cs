@@ -9,10 +9,6 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float rotationSpeed = 500f;
     [SerializeField] private float positionRange = 3f;
 
-    void Start()
-    {
-        // Reference to the animator
-    }
     public override void OnNetworkSpawn()
     {
         UpdatePositionServerRpc();
