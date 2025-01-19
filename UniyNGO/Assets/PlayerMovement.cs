@@ -1,19 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed = 7f;
     [SerializeField] private float rotationSpeed = 500f;
+    [SerializeField] private float positionRange = 3f;
 
     void Start()
     {
         // Reference to the animator
     }
+    public override void OnNetworkSpawn()
+    {
+        UpdatePositionServerRpc();
+    }
 
     void Update()
     {
+        if (!IsOwner) return;
         // Cache input values in floats
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -33,4 +40,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdatePositionServerRpc()
+    {
+        transform.position = new Vector3(Random.Range(positionRange, -positionRange), 1, Random.Range(positionRange, -positionRange));
+        transform.rotation = new Quaternion(0, 180, 0, 0);
+    }    
 }

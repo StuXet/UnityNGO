@@ -1,16 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
+using TMPro;
+using UnityEngine.UI;
 
-public class NetworkUI : MonoBehaviour
+public class NetworkUI : NetworkBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private Button hostButton;
+    [SerializeField] private Button clientButton;
+    [SerializeField] private TextMeshProUGUI playersCountText;
+
+    private NetworkVariable<int> playersNum = new NetworkVariable<int>(
+        0, NetworkVariableReadPermission.Everyone);
+
+    private void Awake()
     {
-        
+        hostButton.onClick.AddListener(() =>
+        {
+            NetworkManager.Singleton.StartHost();
+        });
+
+        clientButton.onClick.AddListener(() =>
+        {
+            NetworkManager.Singleton.StartClient();
+        });
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        playersCountText.text = "Players: " + playersNum.Value.ToString();
+
+        if (!IsServer) return;
+        //playersNum.Value = NetworkManager.Singleton.ConnectedClients.Count;
     }
 }
