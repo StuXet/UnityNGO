@@ -8,14 +8,21 @@ public class ShootProjectile : NetworkBehaviour
     [SerializeField] private Transform shootTransform;
     [SerializeField] private List<GameObject> spawnedProjectiles = new List<GameObject>();
 
-    private void Update()
-    {
-        if (!IsOwner) return;
+    private InputSystem_Actions inputActions;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ShootServerRpc();
-        }
+    private void OnEnable()
+    {
+        inputActions = new InputSystem_Actions();
+        inputActions.Enable();
+
+        // Bind the Shoot action to the method
+        inputActions.Player.Attack.performed += _ => ShootServerRpc();
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Player.Attack.performed -= _ => ShootServerRpc();
+        inputActions.Disable();
     }
 
     [ServerRpc]
@@ -28,7 +35,7 @@ public class ShootProjectile : NetworkBehaviour
         var moveProjectile = go.GetComponent<MoveProjectile>();
         if (moveProjectile != null)
         {
-            moveProjectile.parent = this;
+            moveProjectile.parent = this; // Set reference to this ShootProjectile instance
         }
 
         go.GetComponent<NetworkObject>().Spawn();
@@ -47,8 +54,8 @@ public class ShootProjectile : NetworkBehaviour
         GameObject toDestroy = spawnedProjectiles[0];
         if (toDestroy != null)
         {
-            toDestroy.GetComponent<NetworkObject>().Despawn();
             spawnedProjectiles.Remove(toDestroy);
+            toDestroy.GetComponent<NetworkObject>().Despawn();
             Destroy(toDestroy);
         }
     }

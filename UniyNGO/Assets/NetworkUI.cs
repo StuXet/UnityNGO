@@ -9,7 +9,7 @@ public class NetworkUI : NetworkBehaviour
 {
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
-    [SerializeField] private TextMeshProUGUI playersCountText;
+    //[SerializeField] private TextMeshProUGUI playersCountText;
 
     private NetworkVariable<int> playersNum = new NetworkVariable<int>(
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -27,11 +27,11 @@ public class NetworkUI : NetworkBehaviour
         });
     }
 
-    private void Update()
-    {
-        playersCountText.text = "Players: " + playersNum.Value.ToString();
+    //private void Update()
+    //{
+        //playersCountText.text = "Players: " + playersNum.Value.ToString();
 
-        if (!IsServer) return;
+        //if (!IsServer) return;
         //playersNum.Value = NetworkManager.Singleton.ConnectedClients.Count;
-    }
+    //}
 }

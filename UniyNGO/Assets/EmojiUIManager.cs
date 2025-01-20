@@ -6,34 +6,25 @@ public class EmojiUIManager : NetworkBehaviour
 {
     [SerializeField] private TextMeshProUGUI emojiDisplay;
     private NetworkVariable<int> currentEmojiIndex = new NetworkVariable<int>(0);
+    private InputSystem_Actions inputActions;
 
-    private readonly string[] emojis = { "", "😊", "😂" }; // Add more emojis as needed
-
-    private void Update()
-    {
-        if (!IsOwner) return;
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SetEmojiServerRpc(1); // Display Emoji 1
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SetEmojiServerRpc(2); // Display Emoji 2
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SetEmojiServerRpc(0); // Clear Emoji
-        }
-    }
+    private readonly string[] emojis = { "", "😊", "😂" };
 
     private void OnEnable()
     {
+        inputActions = new InputSystem_Actions();
+        inputActions.Enable();
+
+        inputActions.UI.Num1.performed += _ => SetEmojiServerRpc(1);
+        inputActions.UI.Num2.performed += _ => SetEmojiServerRpc(2);
+        inputActions.UI.Num3.performed += _ => SetEmojiServerRpc(0);
+
         currentEmojiIndex.OnValueChanged += UpdateEmojiUI;
     }
 
     private void OnDisable()
     {
+        inputActions.Disable();
         currentEmojiIndex.OnValueChanged -= UpdateEmojiUI;
     }
 
