@@ -4,8 +4,8 @@ using TMPro;
 
 public class EmojiUIManager : NetworkBehaviour
 {
-    [SerializeField] private TextMeshProUGUI emojiDisplay; // Assign the TMP Text component
-    private NetworkVariable<int> currentEmojiIndex = new NetworkVariable<int>(0); // 0: No emoji, 1: Emoji1, 2: Emoji2
+    [SerializeField] private TextMeshProUGUI emojiDisplay;
+    private NetworkVariable<int> currentEmojiIndex = new NetworkVariable<int>(0);
 
     private readonly string[] emojis = { "", "😊", "😂" }; // Add more emojis as needed
 

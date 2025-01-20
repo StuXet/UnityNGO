@@ -13,7 +13,7 @@ public class MoveProjectile : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.linearVelocity = transform.forward * shootForce; // Set initial velocity
+            rb.linearVelocity = transform.forward * shootForce;
         }
     }
 
@@ -21,21 +21,33 @@ public class MoveProjectile : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        Debug.Log("Projectile hit: " + other.name);
+        if (other.CompareTag("Player"))
+        {
+            HandlePlayerHitServerRpc(other.gameObject.GetComponent<NetworkObject>().OwnerClientId);
+        }
 
-        // Call the ServerRpc to destroy the projectile and spawn particles
         InstantiateHitParticlesServerRpc();
-
-        // Inform the parent to destroy the projectile
         parent.DestroyServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void HandlePlayerHitServerRpc(ulong targetClientId)
+    {
+        var targetPlayer = NetworkManager.Singleton.ConnectedClients[targetClientId].PlayerObject.GetComponent<PlayerSettings>();
+        var killerPlayer = parent.GetComponent<PlayerSettings>();
+
+        // Add score to killer
+        killerPlayer.AddScoreServerRpc();
+
+        // Respawn the target player
+        Vector3 respawnPosition = new Vector3(Random.Range(-5, 5), 1, Random.Range(-5, 5));
+        targetPlayer.RespawnPlayerServerRpc(respawnPosition);
     }
 
     [ServerRpc]
     private void InstantiateHitParticlesServerRpc()
     {
-        // Instantiate and spawn the hit particles
         GameObject hitImpact = Instantiate(hitParticles, transform.position, Quaternion.identity);
         hitImpact.GetComponent<NetworkObject>().Spawn();
-        hitImpact.transform.localEulerAngles = new Vector3(0f, 0f, -90f);
     }
 }
